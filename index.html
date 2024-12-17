@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tic Tac Toe Game</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom animations */
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .scale-hover:hover {
+      transform: scale(1.1);
+      transition: transform 0.2s ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-purple-500 to-blue-500 min-h-screen flex items-center justify-center">
+  <!-- Main Game Container -->
+  <div class="text-center">
+    <!-- Title -->
+    <h1 class="text-white text-4xl font-bold mb-4 fade-in">Tic Tac Toe</h1>
+
+    <!-- Start Button -->
+    <button id="startButton" class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg hover:bg-blue-700 transition fade-in">
+      Start Game
+    </button>
+
+    <!-- Game Board -->
+    <div id="gameBoard" class="grid grid-cols-3 gap-4 mt-6 hidden">
+      <div class="cell w-24 h-24 bg-white rounded-lg flex items-center justify-center shadow-lg cursor-pointer text-2xl font-bold transition scale-hover"></div>
+      <div class="cell w-24 h-24 bg-white rounded-lg flex items-center justify-center shadow-lg cursor-pointer text-2xl font-bold transition scale-hover"></div>
+      <div class="cell w-24 h-24 bg-white rounded-lg flex items-center justify-center shadow-lg cursor-pointer text-2xl font-bold transition scale-hover"></div>
+      <div class="cell w-24 h-24 bg-white rounded-lg flex items-center justify-center shadow-lg cursor-pointer text-2xl font-bold transition scale-hover"></div>
+      <div class="cell w-24 h-24 bg-white rounded-lg flex items-center justify-center shadow-lg cursor-pointer text-2xl font-bold transition scale-hover"></div>
+      <div class="cell w-24 h-24 bg-white rounded-lg flex items-center justify-center shadow-lg cursor-pointer text-2xl font-bold transition scale-hover"></div>
+      <div class="cell w-24 h-24 bg-white rounded-lg flex items-center justify-center shadow-lg cursor-pointer text-2xl font-bold transition scale-hover"></div>
+      <div class="cell w-24 h-24 bg-white rounded-lg flex items-center justify-center shadow-lg cursor-pointer text-2xl font-bold transition scale-hover"></div>
+      <div class="cell w-24 h-24 bg-white rounded-lg flex items-center justify-center shadow-lg cursor-pointer text-2xl font-bold transition scale-hover"></div>
+    </div>
+
+    <!-- Winning Popup -->
+    <div id="winnerPopup" class="fixed inset-0 bg-black bg-opacity-60 hidden flex items-center justify-center">
+      <div class="bg-white p-6 rounded-lg text-center shadow-lg fade-in">
+        <h2 id="winnerText" class="text-2xl font-bold mb-4 text-gray-800"></h2>
+        <button id="restartButton" class="bg-green-500 text-white px-6 py-2 rounded-lg shadow-lg hover:bg-green-600">
+          Restart Game
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const startButton = document.getElementById("startButton");
+      const gameBoard = document.getElementById("gameBoard");
+      const cells = document.querySelectorAll(".cell");
+      const winnerPopup = document.getElementById("winnerPopup");
+      const winnerText = document.getElementById("winnerText");
+      const restartButton = document.getElementById("restartButton");
+
+      let currentPlayer = "X";
+      let board = Array(9).fill(null);
+      let gameActive = true;
+
+      const winningCombinations = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+      ];
+
+      const clickSound = new Audio("https://www.soundjay.com/button/button-09.mp3");
+      const winSound = new Audio("https://www.soundjay.com/button/button-10.mp3");
+
+      // Start Game
+      startButton.addEventListener("click", () => {
+        startButton.classList.add("hidden");
+        gameBoard.classList.remove("hidden");
+      });
+
+      // Handle Cell Click
+      cells.forEach((cell, index) => {
+        cell.addEventListener("click", () => {
+          if (!cell.textContent && gameActive) {
+            clickSound.play();
+            cell.textContent = currentPlayer;
+            board[index] = currentPlayer;
+            cell.classList.add(currentPlayer === "X" ? "text-blue-600" : "text-red-600");
+
+            if (checkWinner(currentPlayer)) {
+              endGame(`${currentPlayer} Wins!`);
+            } else if (board.every((cell) => cell)) {
+              endGame("It's a Tie!");
+            } else {
+              currentPlayer = currentPlayer === "X" ? "O" : "X";
+            }
+          }
+        });
+      });
+
+      // Check for Winner
+      function checkWinner(player) {
+        return winningCombinations.some((combination) =>
+          combination.every((index) => board[index] === player)
+        );
+      }
+
+      // End Game
+      function endGame(message) {
+        winSound.play();
+        gameActive = false;
+        winnerText.textContent = message;
+        winnerPopup.classList.remove("hidden");
+      }
+
+      // Restart Game
+      restartButton.addEventListener("click", () => {
+        board = Array(9).fill(null);
+        currentPlayer = "X";
+        gameActive = true;
+        cells.forEach((cell) => {
+          cell.textContent = "";
+          cell.classList.remove("text-blue-600", "text-red-600");
+        });
+        winnerPopup.classList.add("hidden");
+      });
+    });
+  </script>
+</body>
+</html>
